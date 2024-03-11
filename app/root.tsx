@@ -3,6 +3,7 @@ import tailwindCSS from "./tailwind.css";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import {
+  Form,
   Links,
   LiveReload,
   Meta,
@@ -25,6 +26,7 @@ export default function App() {
         <Links />
       </head>
       <body>
+        
         <Outlet />
         <ScrollRestoration />
         <Scripts />
