@@ -13,6 +13,9 @@ export default {
       events: true,
       fs: true,
       assert: true,
-    }
+    },
+    globals:{
+      Buffer: true,
+    },
   }
 };

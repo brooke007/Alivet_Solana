@@ -16,7 +16,9 @@ export const loader = async () => {
   return json(response.items);
 };
 
+
 export default function NFT() {
+  
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('点击编辑名字');
 
@@ -54,49 +56,19 @@ export default function NFT() {
                   className="w-full"
                   src={nft.content?.files?.[0]?.cdn_uri}
                   alt={nft.content?.metadata.description}
+                  draggable="true"
+                  onDragStart={(e) => {
+                    // 确保URL存在，否则传递一个空字符串或默认值
+                    const imageUrl = nft.content?.files?.[0]?.cdn_uri || '';
+                    e.dataTransfer.setData("text/plain", imageUrl);
+                  }}
                 />
-                  <div>
-                  {!isEditing ? (
-                    <div onClick={handleNameClick} style={{ cursor: 'pointer', userSelect: 'none' }}>
-                      {name}
-                    </div>
-                  ) : (
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={handleInputChange}
-                      onBlur={handleInputBlur}
-                      onKeyPress={handleKeyPress}
-                      autoFocus
-                      style={{
-                        padding: '8px',
-                        fontSize: '16px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                      }}
-                    />
-                  )}
-                    </div>
-                  {/* <div className="text-xl mb-2">
+          
+                  { <div className="text-xl mb-2">
                     {nft.content?.metadata.name}
-                  </div> */}
+                  </div> }
 
                   
-                  {/* <p className="text-gray-700 text-base">
-                    {nft.content?.metadata.description}
-                  </p> */}
-                
-                {/* <div className="px-6 pt-4 pb-2">
-                  {nft.content?.metadata.attributes &&
-                    nft.content?.metadata.attributes?.map((trait) => (
-                      <span
-                        className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-                        key={trait["trait_type"]}
-                      >
-                        {trait["trait_type"]}: {trait.value}
-                      </span>
-                    ))}
-                </div> */}
               </div>
             </li>
           ))}
