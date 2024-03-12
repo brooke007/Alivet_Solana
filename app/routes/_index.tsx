@@ -1,7 +1,7 @@
 import { json, useLoaderData } from "@remix-run/react";
 import { Helius } from "helius-sdk";
 import type { FunctionComponent, SetStateAction } from "react";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 // 定义图片类型，包括URL和位置
 interface ImageInfo {
@@ -9,6 +9,8 @@ interface ImageInfo {
   url: string;
   x: number;
   y: number;
+  rotation: number;
+  scale: number;
 }
 
 
@@ -53,6 +55,17 @@ export default function NFT() {
     }
   };
 
+  // 检测是否s键被按下
+  const [isSPressed, setIsSPressed] = useState(false);
+
+  const scaleImage = useCallback((id: number, scaleFactor: number) => {
+    setImages(prevImages =>
+      prevImages.map(img =>
+        img.id === id ? { ...img, scale: Math.max(img.scale + scaleFactor, 0.1) } : img // 确保缩放比例不会小于0.1
+      )
+    );
+  }, []);
+  
 
   const data = useLoaderData<typeof loader>();
 
@@ -92,7 +105,7 @@ export default function NFT() {
       // 如果是从外部拖入的图片，添加新图片
       setImages(prevImages => [
         ...prevImages,
-        { id: prevImages.length, url: imageUrl, x, y }
+        { id: prevImages.length, url: imageUrl, x, y, rotation:0, scale: 1 }
       ]);
     }
   }, []);
@@ -130,6 +143,41 @@ export default function NFT() {
     setDraggedImageId(null);
   }, []);
 
+  const rotateImage = useCallback((id: number) => {
+    setImages(prevImages =>
+      prevImages.map(img =>
+        img.id === id ? { ...img, rotation: (img.rotation + 90) % 360 } : img
+      )
+    );
+  }, []);
+
+  
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 's' || e.key === 'S') {
+          setIsSPressed(true);
+        }
+      };
+  
+      console.log(`isSPressed: ${isSPressed}`);
+      const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.key === 's' || e.key === 'S') {
+          setIsSPressed(false);
+        }
+      };
+      console.log(`isSPressed: ${isSPressed}`);
+
+      // 添加键盘事件监听器
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
+  
+      // 清理函数
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('keyup', handleKeyUp);
+      };
+    }, []);
+
   return (
     <div style = {{ 
       display: 'flex', 
@@ -166,6 +214,8 @@ export default function NFT() {
               </div>
             </li>
           ))}
+
+                  
         </ul>
     </div>
 
@@ -192,12 +242,26 @@ export default function NFT() {
           <img
             key={image.id}
             src={image.url}
-            draggable
+            draggable="true"
             onDragStart={(e) => onImageDragStart(e, image.id)}
             onDragEnd={onDragEnd}
-            style={{ position: 'absolute', left: image.x, top: image.y, maxWidth: '100px' }}
+            onClick={() => {
+              if (isSPressed){
+                scaleImage(image.id, image.scale + 0.01);
+              }else{
+                rotateImage(image.id);
+              }
+              //console.log(`${isSPressed}`);
+            }}
+            style={{ 
+            position: 'absolute', 
+            left: image.x, 
+            top: image.y, 
+            cursor: 'pointer',
+            transform: `rotate(${image.rotation}deg) scale(${image.scale})` ,
+            maxWidth: '100px' }}
           />
-
+          
         );
       })}
       
