@@ -655,3 +655,32 @@ video {
   display: flex;
   align-items: center;
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-group {
+  margin-top: 20px;
+}
+
+.button-group button {
+  background-color: #4CAF50; /* 绿色 */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px; /* 圆角边框 */
+  transition: background-color 0.3s ease; /* 过渡效果 */
+}
+
+.button-group button:hover {
+  background-color: #45a049; /* 深绿色 */
+}

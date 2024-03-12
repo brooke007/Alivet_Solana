@@ -69,6 +69,7 @@ export default function NFT() {
 
   const data = useLoaderData<typeof loader>();
 
+  // 图片信息
   const [images, setImages] = useState<ImageInfo[]>([]);
   const [dragging, setDragging] = useState(false);
   const [draggedImageId, setDraggedImageId] = useState<number | null>(null);
@@ -122,6 +123,27 @@ export default function NFT() {
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/id", id.toString()); // 需要设置数据，否则不会触发drop
   }, []);
+
+
+
+  // 处理设置开始关键帧的逻辑
+  const setStartKeyframe = () => {
+    // 实现设置开始关键帧的逻辑
+    console.log("设置为开始关键帧");
+    // 您可能需要更新某个图像的状态或是设置某个状态来标记这个为开始关键帧
+  };
+
+  // 处理设置普通关键帧的逻辑
+  const setKeyframe = () => {
+    console.log("设置为普通关键帧");
+    // 类似地，实现逻辑
+  };
+
+  // 处理设置结束关键帧的逻辑
+  const setEndKeyframe = () => {
+    console.log("设置为结束关键帧");
+    // 实现逻辑
+  };
 
   // 移动画板上的图片
   const onImageDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -185,7 +207,7 @@ export default function NFT() {
       padding: '0 20px'}}>
     <div className="p-4"
       style = {{
-        width: '35%',
+        width: '25%',
         overflowY: 'auto',
         height: '100vh',
         marginRight: '10px'
@@ -209,13 +231,9 @@ export default function NFT() {
                   { <div className="text-xl mb-2">
                     {nft.content?.metadata.name}
                   </div> }
-
-                  
               </div>
             </li>
-          ))}
-
-                  
+          ))}    
         </ul>
     </div>
 
@@ -227,12 +245,12 @@ export default function NFT() {
       style={{ 
         position: 'sticky',
         top: 50,
-        width: '65%', 
+        width: '75%', 
         minHeight: '700px', 
         border: '2px dashed #ccc',  
         display: 'flex', 
-        flexDirection: 'row' ,
-        left: 350,
+        flexDirection: 'row',
+        left: 300,
         alignSelf: 'flex-start',
         marginLeft: '10px'}}
     >
@@ -264,9 +282,12 @@ export default function NFT() {
           
         );
       })}
-      
     </div>
-
+      <div className="keyframe-buttons" style={{ marginTop: '20px' }}>
+        <button onClick={setStartKeyframe}>Start Keyframe</button>
+        <button onClick={setKeyframe}>Intermediate Keyframe</button>
+        <button onClick={setEndKeyframe}>End Keyframe</button>
+      </div>
     </div>
   );
 }
