@@ -7,15 +7,20 @@ export default {
   // serverBuildPath: "build/index.js",
   browserNodeBuiltinsPolyfill: {
     modules: {
-      buffer: true,
-      crypto: true,
+      http: true,
+      https: true,
+      zlib: true,
+      util: true,
+      url: true,
       stream: true,
-      events: true,
-      fs: true,
       assert: true,
-    },
-    globals:{
+      string_decoder: true,
+      events: true,
+      buffer: true,
+      fs: true,
+      crypto: true
+    }, globals: {
       Buffer: true,
     },
-  }
+  },
 };

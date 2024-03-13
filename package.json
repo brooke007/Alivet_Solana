@@ -12,17 +12,33 @@
     "start": "remix-serve build"
   },
   "dependencies": {
+    "@heroicons/react": "^1.0.5",
+    "@noble/ed25519": "^1.7.1",
     "@remix-run/css-bundle": "^2.8.0",
     "@remix-run/node": "^2.8.0",
     "@remix-run/react": "^2.8.0",
     "@remix-run/serve": "^2.8.0",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+    "@solana/wallet-adapter-wallets": "^0.19.31",
+    "@solana/web3.js": "^1.73.0",
+    "@tailwindcss/typography": "^0.5.9",
+    "autoprefixer": "^10.4.18",
+    "crypto-browserify": "^3.12.0",
+    "daisyui": "^1.24.3",
+    "date-fns": "^2.29.3",
+    "eslint-config-next": "^13.1.5",
     "helius-sdk": "^1.2.5",
+    "immer": "^9.0.12",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "zustand": "^3.6.9"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.8.0",
+    "@types/node": "^18.11.18",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
@@ -34,8 +50,12 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.1.6"
+  },
+  "browser": {
+    "crypto": false
   },
   "engines": {
     "node": ">=18.0.0"
