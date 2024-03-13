@@ -209,6 +209,27 @@ export default function NFT() {
       };
     }, []);
 
+    const saveKeyframes = () => {
+      // 直接使用当前的images状态作为关键帧数据
+      const keyframeData = JSON.stringify(images, null, 2); // 美化JSON输出
+      
+      // 调用函数来将数据保存到文件
+      downloadKeyframeData(keyframeData, 'keyframe.json');
+    };
+    
+    // Utility function to trigger a file download in the browser
+    function downloadKeyframeData(data: string, filename: string) {
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
     return (
       <div style = {{ 
         display: 'flex', 
