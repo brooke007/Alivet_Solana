@@ -656,31 +656,30 @@ video {
   align-items: center;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .button-group {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: row; /* 水平排列按钮 */
+  margin-top: 10%; /* 或更多，根据需要调整，以便按钮位于更下方 */
+  margin-left: 0px; /* 或更多，根据需要调整，以便按钮位于更左侧 */
 }
 
 .button-group button {
   background-color: #4CAF50; /* 绿色 */
   border: none;
   color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
+  padding: 10px 25px; /* 调整padding以适应设计 */
   font-size: 16px;
-  margin: 4px 2px;
   cursor: pointer;
-  border-radius: 8px; /* 圆角边框 */
-  transition: background-color 0.3s ease; /* 过渡效果 */
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  width: 180px; /* 确保每个按钮都有相同的长度 */
+  margin-right: 10px; /* 在按钮之间添加一些空间 */
+}
+
+.button-group button:last-child {
+  margin-right: 0; /* 移除最后一个按钮右边的外边距 */
 }
 
 .button-group button:hover {
-  background-color: #45a049; /* 深绿色 */
+  background-color: #2d66ed; /* 深绿色 */
 }

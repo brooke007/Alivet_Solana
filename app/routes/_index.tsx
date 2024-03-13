@@ -69,7 +69,7 @@ export default function NFT() {
 
   const data = useLoaderData<typeof loader>();
 
-  // 图片信息
+  // 图片信息fe
   const [images, setImages] = useState<ImageInfo[]>([]);
   const [dragging, setDragging] = useState(false);
   const [draggedImageId, setDraggedImageId] = useState<number | null>(null);
@@ -200,94 +200,104 @@ export default function NFT() {
       };
     }, []);
 
-  return (
-    <div style = {{ 
-      display: 'flex', 
-      flexDirection: 'row', 
-      padding: '0 20px'}}>
-    <div className="p-4"
-      style = {{
-        width: '25%',
-        overflowY: 'auto',
-        height: '100vh',
-        marginRight: '10px'
-      }}>
-      <ul>
-          {data.map((nft) => (
-            <li key={nft.id}>
-              <div className="max-w-sm  m-2 rounded overflow-hidden shadow-lg item">
-                <img
-                  className="w-full"
-                  src={nft.content?.files?.[0]?.cdn_uri}
-                  alt={nft.content?.metadata.description}
-                  draggable="true"
-                  onDragStart={(e) => {
-                    // 确保URL存在，否则传递一个空字符串或默认值
-                    const imageUrl = nft.content?.files?.[0]?.cdn_uri || '';
-                    e.dataTransfer.setData("text/plain", imageUrl);
-                  }}
-                />
-          
-                  { <div className="text-xl mb-2">
-                    {nft.content?.metadata.name}
-                  </div> }
-              </div>
-            </li>
-          ))}    
-        </ul>
-    </div>
-
-    <div
-      className="drawing-board"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onMouseMove={onBoardMouseMove} 
-      style={{ 
-        position: 'sticky',
-        top: 50,
-        width: '75%', 
-        minHeight: '700px', 
-        border: '2px dashed #ccc',  
+    return (
+      <div style = {{ 
         display: 'flex', 
-        flexDirection: 'row',
-        left: 300,
-        alignSelf: 'flex-start',
-        marginLeft: '10px'}}
-    >
-      {images.map((image) => {
-
-        return (
-          <img
-            key={image.id}
-            src={image.url}
-            draggable="true"
-            onDragStart={(e) => onImageDragStart(e, image.id)}
-            onDragEnd={onDragEnd}
-            onClick={() => {
-              if (isSPressed){
-                scaleImage(image.id, image.scale + 0.01);
-              }else{
-                rotateImage(image.id);
-              }
-              //console.log(`${isSPressed}`);
-            }}
-            style={{ 
-            position: 'absolute', 
-            left: image.x, 
-            top: image.y, 
-            cursor: 'pointer',
-            transform: `rotate(${image.rotation}deg) scale(${image.scale})` ,
-            maxWidth: '100px' }}
-          />
+        flexDirection: 'row', 
+        padding: '0 5px',
+        marginLeft: '0px'}}>
+      <div className="p-4"
+        style = {{
+          width: '30%',
+          overflowY: 'auto',
+          height: '100vh',
           
-        );
-      })}
-    </div>
-      <div className="keyframe-buttons" style={{ marginTop: '20px' }}>
-        <button onClick={setStartKeyframe}>Start Keyframe</button>
-        <button onClick={setKeyframe}>Intermediate Keyframe</button>
-        <button onClick={setEndKeyframe}>End Keyframe</button>
-      </div>
-    </div>
-  );
+        }}>
+        <ul>
+            {data.map((nft) => (
+              <li key={nft.id}>
+                <div className="max-w-sm  m-2 rounded overflow-hidden shadow-lg item">
+                  <img
+                    className="w-full"
+                    src={nft.content?.files?.[0]?.cdn_uri}
+                    alt={nft.content?.metadata.description}
+                    draggable="true"
+                    onDragStart={(e) => {
+                      // 确保URL存在，否则传递一个空字符串或默认值
+                      const imageUrl = nft.content?.files?.[0]?.cdn_uri || '';
+                      e.dataTransfer.setData("text/plain", imageUrl);
+                    }}
+                  />
+            
+                    { <div className="text-xl mb-2">
+                      {nft.content?.metadata.name}
+                    </div> }
+  
+                    
+                </div>
+              </li>
+                ))}
+
+                  
+                </ul>
+            </div>
+        
+          <div>
+            <div
+              className="drawing-board"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onMouseMove={onBoardMouseMove} 
+              style={{ 
+                position: 'sticky',
+                top: 50,
+                width: '170%', 
+                minHeight: '700px', 
+                border: '2px dashed #ccc',  
+                display: 'flex', 
+                flexDirection: 'row' ,
+                left: 5,
+                alignSelf: 'flex-start',
+                marginLeft: '10px'}}
+            >
+              {images.map((image) => {
+        
+                return (
+                  <img
+                    key={image.id}
+                    src={image.url}
+                    draggable="true"
+                    onDragStart={(e) => onImageDragStart(e, image.id)}
+                    onDragEnd={onDragEnd}
+                    onClick={() => {
+                      if (isSPressed){
+                        scaleImage(image.id, image.scale + 0.01);
+                      }else{
+                        rotateImage(image.id);
+                      }
+                      //console.log(`${isSPressed}`);
+                    }}
+                    style={{ 
+                    position: 'absolute', 
+                    left: image.x, 
+                    top: image.y, 
+                    cursor: 'pointer',
+                    transform: `rotate(${image.rotation}deg) scale(${image.scale})` ,
+                    maxWidth: '100px' }}
+                  />
+                  
+                );
+              })}
+              
+            </div>
+
+            <div className="button-group">
+              <button onClick={setStartKeyframe}>Start Keyframe</button>
+              <button onClick={setKeyframe}>Normal Keyframe</button>
+              <button onClick={setEndKeyframe}>End Keyframe</button>
+            </div>
+
+        </div>
+            </div>
+          );
 }
