@@ -57,16 +57,17 @@ export default function NFT() {
 
   // 检测是否s键被按下
   const [isSPressed, setIsSPressed] = useState(false);
+  const [isDPressed, setIsDPressed] = useState(false);
 
   const scaleImage = useCallback((id: number, scaleFactor: number) => {
     setImages(prevImages =>
       prevImages.map(img =>
-        img.id === id ? { ...img, scale: Math.max(img.scale + scaleFactor, 0.1) } : img // 确保缩放比例不会小于0.1
+        img.id === id ? { ...img, scale: Math.max(img.scale + scaleFactor, -100) } : img // 确保缩放比例不会小于0.1
       )
     );
   }, []);
   
-
+  
   const data = useLoaderData<typeof loader>();
 
   // 图片信息fe
@@ -179,15 +180,23 @@ export default function NFT() {
         if (e.key === 's' || e.key === 'S') {
           setIsSPressed(true);
         }
+
+        if (e.key === 'd' || e.key === 'D') {
+          setIsDPressed(true);
+        }
       };
   
-      console.log(`isSPressed: ${isSPressed}`);
+
       const handleKeyUp = (e: KeyboardEvent) => {
         if (e.key === 's' || e.key === 'S') {
           setIsSPressed(false);
         }
+
+        if (e.key === 'd' || e.key === 'D') {
+          setIsDPressed(true);
+        }
       };
-      console.log(`isSPressed: ${isSPressed}`);
+
 
       // 添加键盘事件监听器
       window.addEventListener('keydown', handleKeyDown);
@@ -271,7 +280,9 @@ export default function NFT() {
                     onDragEnd={onDragEnd}
                     onClick={() => {
                       if (isSPressed){
-                        scaleImage(image.id, image.scale + 0.01);
+                        scaleImage(image.id, 0.1);
+                      }else if(isDPressed){
+                        scaleImage(image.id, -0.1);
                       }else{
                         rotateImage(image.id);
                       }
