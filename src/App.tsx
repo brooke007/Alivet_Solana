@@ -11,6 +11,9 @@ import { SolongWalletAdapter } from "@solana/wallet-adapter-solong";
 import { clusterApiUrl } from "@solana/web3.js";
 import Home from "./pages/home";
 
+import Show from "./pages/show";
+import { Routes, Route } from "react-router-dom";
+
 function App() {
   const DEFAULT_NETWORK = WalletAdapterNetwork.Mainnet;
   const [curNetwork, setCurNetWork] = useState(DEFAULT_NETWORK);
@@ -25,12 +28,21 @@ function App() {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <div className="h-screen flex flex-col">
-            <Header network={curNetwork} setNetWork={setCurNetWork}></Header>
-            <main className="flex-1 overflow-hidden">
-              <Home />
-            </main>
-          </div>
+          <Routes>
+            <Route path="/" element={<Show />}></Route>
+            <Route
+              path="/home"
+              element={
+                <div className="w-srceen h-screen flex flex-col">
+                  <Header
+                    network={curNetwork}
+                    setNetWork={setCurNetWork}
+                  ></Header>
+                  <Home />
+                </div>
+              }
+            ></Route>
+          </Routes>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

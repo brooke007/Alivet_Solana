@@ -23,8 +23,4 @@ function calculateOffset(e: React.DragEvent<HTMLDivElement>) {
   e.dataTransfer.setData("text/y", String(offsetY));
 }
 
-export {
-  transferOffset,
-  calculateNewPosition,
-  calculateOffset,
-}
+export { transferOffset, calculateNewPosition, calculateOffset };

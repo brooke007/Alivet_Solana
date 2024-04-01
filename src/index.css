@@ -74,3 +74,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+@font-face{
+  font-family: Alivet;
+  src: url("/src/assets/fonts/36b396391257736f6f86496e2e6ac618.woff2");
+}
