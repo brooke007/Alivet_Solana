@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { Link } from "react-router-dom";
 
 interface IHeaderProps {
   network: string;
@@ -26,13 +27,19 @@ const Header: FC<IHeaderProps> = ({ setNetWork, network }) => {
 
   return (
     <div>
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 backdrop-blur shadow">
+      <header
+        className="sticky top-0 z-50 w-full"
+        style={{
+          background: "linear-gradient(to left, #8951F5, #80ACCE, #39E69E)",
+        }}
+      >
         <div className="container flex h-14 items-center max-w-screen-2xl">
           <div className="mr-4 hidden md:flex">
-            <a className="mr-6 flex items-center space-x-2" href="/">
-              <Logo />
-              <span className="hidden font-bold sm:inline-block">Alivet</span>
-            </a>
+            <Link to="/" className="mr-6 flex items-center space-x-2">
+              <div className="w-40 h-40">
+                <Logo />
+              </div>
+            </Link>
           </div>
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <Select
@@ -45,7 +52,7 @@ const Header: FC<IHeaderProps> = ({ setNetWork, network }) => {
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent color="#000">
                 <SelectGroup>
                   <SelectLabel>Network</SelectLabel>
                   {networks.map((i) => (
@@ -57,11 +64,7 @@ const Header: FC<IHeaderProps> = ({ setNetWork, network }) => {
               </SelectContent>
             </Select>
             <WalletMultiButton
-              style={{
-                backgroundColor: "#C2EFB8",
-                color: "#000",
-                height: "40px",
-              }}
+              style={{ background: "#fff", color: "#000", height: "40px" }}
             />
           </div>
         </div>

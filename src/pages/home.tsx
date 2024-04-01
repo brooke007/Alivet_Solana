@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useWallet } from "@solana/wallet-adapter-react";
 import { getNFT } from "@/lib/helius";
-import { useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import style from "./style.module.css";
-import clsx from "clsx";
 import { IImgItem } from "@/shared/types/img";
 import DrawingBoard from "./drawingBoard";
 import {
@@ -13,6 +10,22 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  Check,
+  Delete,
+  Download,
+  Eraser,
+  MousePointerClick,
+  Play,
+  Plus,
+  RotateCw,
+} from "lucide-react";
+import Keyboard from "@/components/ui/keyboard";
+import MyButton from "@/components/ui/myButton";
+// import Keyboard from "@/components/ui/keyboard";
 
 export default function Home() {
   const { publicKey } = useWallet();
@@ -47,18 +60,20 @@ export default function Home() {
       <>
         {renderData?.length !== 0
           ? renderData.map((data, index) => (
-              <div className="text-center w-[150px] rounded-lg shadow shadow-black bg-black">
-                <img
-                  draggable
-                  className="w-full h-[139.5px] rounded"
-                  alt={data.desc}
-                  key={data.id + "_" + index}
-                  src={data.uri}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", data.uri);
-                  }}
-                ></img>
-                <div className="my-2 px-3 text-[.6rem] font-bold text-white leading-tight w-full text-center items-center truncate">
+              <div>
+                <div className="text-center w-[160px] h-[120px] rounded-lg bg-[#353637] py-4 px-2">
+                  <img
+                    draggable
+                    className="w-full h-full object-cover rounded"
+                    alt={data.desc}
+                    key={data.id + "_" + index}
+                    src={data.uri}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("text/plain", data.uri);
+                    }}
+                  ></img>
+                </div>
+                <div className="w-[160px] my-2  text-[14px] from-neutral-300  text-[#E8E8E8]  text-start items-center truncate ">
                   {data.name}
                 </div>
               </div>
@@ -70,50 +85,62 @@ export default function Home() {
     );
   };
 
+  interface ITipProps {
+    Icon: any;
+    content?: string;
+  }
+  const Tip: FC<ITipProps> = ({ Icon, content }) => {
+    const Render = () => {
+      if (content) {
+        return (
+          <>
+            + <Keyboard content={content}></Keyboard>
+          </>
+        );
+      }
+    };
+
+    return (
+      <div className="py-1 px-2 rounded-full border flex items-center gap-2 bg-white border-gray-300">
+        <MousePointerClick />
+        <Render />
+        <ArrowRight color="#ccc"></ArrowRight> <Icon />
+      </div>
+    );
+  };
+
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="w-screen rounded-lg border"
-    >
-      <ResizablePanel className="min-w-[200px]" defaultSize={20}>
-        <div className="flex flex-col h-full">
-          <div className="flex-1 flex flex-wrap items-center justify-center gap-3 overflow-y-scroll p-4">
+    <ResizablePanelGroup direction="horizontal" className="w-screen">
+      <ResizablePanel className="min-w-[200px]" defaultSize={15}>
+        <div className="flex flex-col h-full bg-[#252627] rounded-none">
+          <div className="flex-1 flex flex-wrap  items-center justify-evenly gap-2 overflow-y-scroll p-5">
             <RenderImgs />
-          </div>
-          <div
-            className={clsx(
-              "h-[70px] w-full flex items-center justify-center",
-              style.topShadow
-            )}
-          >
-            <Button className="w-[200px]" color="#C2EFB8">
-              Refresh
-            </Button>
           </div>
         </div>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel className="min-w-[700px]" defaultSize={80}>
+      <ResizablePanel className="min-w-[700px]" defaultSize={70}>
         <div className="flex flex-col h-full">
-          <div className="flex-1 p-5 bg-[#F0F4F8]">
-            <DrawingBoard />
-          </div>
-          <div
-            className={clsx([
-              "bg-white h-[70px] flex flex-col items-center",
-              style.topShadow,
-            ])}
-          >
-            <span className="text-gray-400 text-[.8rem]">keyframes</span>
-            <div className="mt-1 gap-2 flex">
-              <Button size="sm">Add</Button>
-              <Button size="sm">Delete</Button>
-              <Button size="sm">Download</Button>
-              <Button size="sm">Play</Button>
+          <div className="h-14 w-full flex items-center px-10 gap-4 bg-gray-100">
+            <div className="flex justify-center gap-2 -translate-x-6">
+              <Tip Icon={RotateCw}></Tip>
             </div>
+            <div className="flex items-center gap-2">
+              <Tip Icon={ArrowUp} content="w" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Tip Icon={ArrowDown} content="s"></Tip>
+            </div>
+            <div className="flex items-center gap-2">
+              <Tip Icon={Delete} content="d"></Tip>
+            </div>
+          </div>
+          <div className="w-full h-full px-3 pb-2 bg-gray-100">
+            <DrawingBoard />
           </div>
         </div>
       </ResizablePanel>
+      <ResizableHandle />
     </ResizablePanelGroup>
   );
 }
