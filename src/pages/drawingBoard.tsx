@@ -7,6 +7,18 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 import style from "./style.module.css";
 import MyButton from "@/components/ui/myButton";
 import { Check, Download, Eraser, Play, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const DrawingBoard: FC = () => {
   const [images, setImages] = useState<IBoardImgItem[]>([]);
@@ -19,6 +31,9 @@ const DrawingBoard: FC = () => {
     isSPressed: false,
     isDPressed: false,
     isWPressed: false,
+  });
+  const [nftData, setnftData] = useState({
+    name: "",
   });
 
   const varifyPostion = (x: number, y: number) => {
@@ -246,6 +261,8 @@ const DrawingBoard: FC = () => {
     };
   }, []);
 
+  const mintNFTHandler = () => {};
+
   return (
     <div
       ref={boardRef}
@@ -292,11 +309,39 @@ const DrawingBoard: FC = () => {
           content={<Download />}
         />
         <MyButton onClick={playLocalKeyframes} desc="play" content={<Play />} />
-        <MyButton
-          onClick={() => {}}
-          desc="tokenlise!"
-          content={<Check />}
-        ></MyButton>
+        <Dialog>
+          <DialogTrigger asChild>
+            <MyButton
+              onClick={() => {}}
+              desc="Mint"
+              content={<Check />}
+            ></MyButton>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>MINT</DialogTitle>
+              <DialogDescription>MINT your GIF as a NFT</DialogDescription>
+            </DialogHeader>
+            <div>
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                value={nftData.name}
+                className="col-span-3"
+                onChange={(e) => {
+                  setnftData({ name: e.currentTarget.value });
+                }}
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" onClick={mintNFTHandler}>
+                Finsh
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

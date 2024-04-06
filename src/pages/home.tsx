@@ -14,18 +14,11 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
-  Check,
   Delete,
-  Download,
-  Eraser,
   MousePointerClick,
-  Play,
-  Plus,
   RotateCw,
 } from "lucide-react";
 import Keyboard from "@/components/ui/keyboard";
-import MyButton from "@/components/ui/myButton";
-// import Keyboard from "@/components/ui/keyboard";
 
 export default function Home() {
   const { publicKey } = useWallet();
