@@ -27,12 +27,7 @@ const Header: FC<IHeaderProps> = ({ setNetWork, network }) => {
 
   return (
     <div>
-      <header
-        className="sticky top-0 z-50 w-full"
-        style={{
-          background: "linear-gradient(to left, #8951F5, #80ACCE, #39E69E)",
-        }}
-      >
+      <header className="sticky top-0 z-50 w-full bg-purple-300">
         <div className="container flex h-14 items-center max-w-screen-2xl">
           <div className="mr-4 hidden md:flex">
             <Link to="/" className="mr-6 flex items-center space-x-2">
