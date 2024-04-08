@@ -187,7 +187,7 @@ export default function Home() {
       gif.on("finished", async function (blob: any) {
         alert.info("uploading metadata...");
         const cid = await upload(blob);
-        alert.info("MINT...It maybe take 1 min...", {
+        alert.info("Minting it may take 1 min...", {
           timeout: 30000,
         });
         await mintCompressedNft(
@@ -211,9 +211,10 @@ export default function Home() {
   }
 
   function playFramesOnCanvas() {
-    const canvas = canvasEl.current;
+    const canvas = document.getElementsByClassName("upper-canvas")[0];
     const ctx = canvas?.getContext("2d");
     let frameIndex = 0;
+    console.log(canvas);
 
     function drawNextFrame() {
       const frame = frames.current[frameIndex++];
@@ -309,7 +310,7 @@ export default function Home() {
                   "relative h-full w-full overfl5w-hidden  border-dashed rounded-md bg-white border-gray-200 border",
                 ])}
               >
-                <canvas height={1000} width={1000} ref={canvasEl} />
+                <canvas height={"1000px"} width={"1000px"} ref={canvasEl} />
                 <div className="text-[1.2rem] uppercase font-bold text-[#D8B4FE] absolute right-5 top-5">
                   {frameCount} Frames Added
                 </div>
@@ -324,6 +325,11 @@ export default function Home() {
                     desc="clear keyframes"
                     content={<Eraser />}
                   />
+                  {/* <MyButton
+                    onClick={playFramesOnCanvas}
+                    desc="clear keyframes"
+                    content={<Play />}
+                  /> */}
                   <MyButton
                     onClick={downloadGif}
                     desc="download"
