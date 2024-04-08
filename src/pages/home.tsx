@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useWallet } from "@solana/wallet-adapter-react";
 import { getNFT } from "@/lib/helius";
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IImgItem } from "@/shared/types/img";
 import clsx from "clsx";
@@ -27,73 +27,114 @@ import {
 import GIF from "gif.js";
 import Loading from "@/components/layout/loading";
 import { Button } from "@/components/ui/button";
+import mintCompressedNft from "@/lib/rpc/mint";
+import upload from "@/lib/rpc/upload";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useAlert } from "react-alert";
+
+function getFileUriFromCid(cid: string) {
+  return `https://${cid}.ipfs.cf-ipfs.com/alivet.gif`;
+}
 
 export default function Home() {
-  const { publicKey } = useWallet();
   const [page] = useState({
     pageNumber: 1,
     pageSize: 10,
-    width: 1000,
-    height: 1000,
+  });
+  const [nftValue, setNftValue] = useState({
+    name: "",
+    desc: "",
   });
   const [isloading, setIsloading] = useState(false);
   const [items, setItems] = useState([] as any);
+  const { publicKey } = useWallet();
   const wallet = useMemo(() => publicKey?.toString(), [publicKey]);
   const canvasEl = useRef<HTMLCanvasElement>(null);
   const canvasObj = useRef<any>(null);
-  const addImg = (uri: string) => {
+  const [frameCount, setFrameCount] = useState(0);
+  const alert = useAlert();
+  const gif = useRef(
+    new GIF({
+      workers: 2,
+      quality: 5,
+      width: 1800,
+      height: 1600,
+      workerScript: "/src/lib/gif.worker.js",
+    })
+  );
+
+  function addImg(uri: string) {
     setIsloading(true); // 开始加载时显示加载状态
 
-    fabric.Image.fromURL(
-      uri,
-      function (img) {
-        const targetWidth = 200;
-        const scaleRatio = targetWidth / (img.width as any);
-        img.set({
-          left: 100,
-          top: 100,
-          selectable: true,
-          hasControls: true,
-          scaleX: scaleRatio,
-          scaleY: scaleRatio,
-          hasBorders: true,
-        });
+    try {
+      fabric.Image.fromURL(
+        uri,
+        function (img) {
+          const targetWidth = 200;
+          const scaleRatio = targetWidth / (img.width as any);
+          img.set({
+            left: 100,
+            top: 100,
+            selectable: true,
+            hasControls: true,
+            scaleX: scaleRatio,
+            scaleY: scaleRatio,
+            hasBorders: true,
+          });
 
-        // 图片加载并设置完成后，添加到画布上
-        setTimeout(() => {
-          canvasObj.current.add(img);
-          setIsloading(false); // 隐藏加载状态
-        }, 200);
-      },
-      { crossOrigin: "anonymous" }
-    );
-  };
-
-  const gif = new GIF({
-    workers: 2,
-    quality: 10,
-    width: 1800,
-    height: 1600,
-    workerScript: "/src/lib/gif.worker.js",
-  });
-
-  function addKeyframe() {
-    if (confirm("use current paint as a frame")) {
-      canvasObj.current?.discardActiveObject(); // 取消选中当前活动对象
-      canvasObj.current?.requestRenderAll();
-      const canvasElement = canvasObj.current.getElement();
-      gif.addFrame(canvasElement, { delay: 200, copy: true });
-      setIsloading(false);
+          setTimeout(async () => {
+            await canvasObj.current.add(img);
+            setIsloading(false);
+          }, 100);
+        },
+        { crossOrigin: "anonymous" }
+      );
+    } catch (e) {
+      alert.error("this img can't load");
     }
   }
+
+  async function addKeyframe() {
+    await canvasObj.current?.discardActiveObject();
+    await canvasObj.current?.requestRenderAll();
+
+    if (confirm("Do you want to use current paint as a frame?")) {
+      const canvasElement = canvasObj.current.getElement();
+      gif.current.addFrame(canvasElement, { delay: 200, copy: true });
+      setFrameCount((pre) => pre + 1);
+      setIsloading(false);
+      alert.success("Add frame success", {
+        timeout: 1500,
+      });
+    }
+  }
+
   function clearKeyframe() {
-    confirm("Do you want to clear current paint?") && canvasObj.current.clear();
+    if (frameCount < 1) {
+      alert.error("Please add frame first");
+      return;
+    }
+    if (confirm("Do you want to clear current paint?")) {
+      canvasObj.current.clear();
+      alert.success("Add frame success", {
+        timeout: 1500,
+      });
+      alert.success("Clear Success");
+    }
   }
 
   function downloadGif() {
+    if (frameCount < 1) {
+      alert.error("Please add frame first");
+      return;
+    }
     if (confirm("download GIF")) {
       setIsloading(true);
-      gif.on("finished", function (blob: any) {
+
+      gif.current.on("finished", function (blob: any) {
+        alert.show("download success", {
+          type: "success",
+        });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -105,49 +146,46 @@ export default function Home() {
       });
 
       // 开始生成 GIF
-      gif.render();
+      gif.current.render();
     }
   }
+
   function mintNFTHandler() {
-    console.log("mint");
-    gif.on("finished", function (blob: any) {
-      // 创建一个指向生成的 GIF Blob 的 URL
-      const url = URL.createObjectURL(blob);
-
-      // 你可以使用这个 URL 来展示 GIF 图像或创建一个下载链接
-      console.log(url); // 输出 URL 以便查看或进一步使用
-
-      // 示例：展示 GIF 图像
-      const img = document.createElement("img");
-      img.src = url;
-      document.body.appendChild(img);
-
-      // 示例：创建一个下载链接
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = "animated.gif"; // 设置下载文件的名称
-      downloadLink.innerText = "Download GIF";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-    });
-    gif.render();
+    if (frameCount < 1) {
+      alert.error("Please add frame first");
+      return;
+    }
+    if (!nftValue.desc || !nftValue.name) {
+      alert.error("Please input your NFT info");
+      return;
+    } else {
+      setIsloading(true);
+      (() => {
+        alert.info("generating GIF....");
+        gif.current.on("finished", async (blob: any) => {
+          alert.info("loading GIF....");
+          const cid = await upload(blob);
+          alert.info("MINT...It maybe take 1 min...", {
+            timeout: 30000,
+          });
+          await mintCompressedNft({
+            desc: nftValue.desc,
+            name: nftValue.name,
+            owner: wallet as string,
+            uri: getFileUriFromCid(cid),
+          }).finally(() => {
+            setIsloading(false);
+          });
+          alert.success("MINT Success", {
+            timeout: 5000,
+          });
+        });
+        gif.current.render();
+      })();
+    }
   }
 
-  useEffect(() => {
-    canvasObj.current = new fabric.Canvas(canvasEl.current);
-    return () => {
-      canvasObj?.current?.dispose();
-    };
-  }, []);
-  useEffect(() => {
-    if (wallet) {
-      getNFT(wallet, page.pageNumber).then((items) => {
-        setItems(items);
-      });
-    }
-  }, [page.pageNumber, publicKey, wallet]);
-
-  const RenderImgs = () => {
+  const RenderImgs = useCallback(() => {
     if (!wallet) {
       return (
         <div className="w-full text-center text-gray-500">Please Login</div>
@@ -189,7 +227,21 @@ export default function Home() {
             )}
       </>
     );
-  };
+  }, [items, wallet]);
+
+  useEffect(() => {
+    canvasObj.current = new fabric.Canvas(canvasEl.current);
+    return () => {
+      canvasObj?.current?.dispose();
+    };
+  }, []);
+  useEffect(() => {
+    if (wallet) {
+      getNFT(wallet, page.pageNumber).then((items) => {
+        setItems(items);
+      });
+    }
+  }, [page.pageNumber, publicKey, wallet]);
 
   return (
     <>
@@ -207,10 +259,13 @@ export default function Home() {
             <div className="w-full h-full px-3 pb-">
               <div
                 className={clsx([
-                  "relative h-full w-full overflow-hidden  border-dashed rounded-md bg-white border-white border-2",
+                  "relative h-full w-full overfl5w-hidden  border-dashed rounded-md bg-white border-white border-2",
                 ])}
               >
                 <canvas height={1000} width={1000} ref={canvasEl} />
+                <div className="text-[1.2rem] uppercase font-bold text-[#D8B4FE] absolute right-5 top-5">
+                  {frameCount} Frames Added
+                </div>
                 <div className="h-[280px] w-[50px] bg-black color-[#fff] absolute rounded-full flex flex-col items-center justify-center gap-4 right-5 bottom-5">
                   <MyButton
                     onClick={addKeyframe}
@@ -248,16 +303,39 @@ export default function Home() {
                         </Label>
                         <Input
                           id="name"
-                          // value={nftData.name}
+                          value={nftValue.name}
                           className="col-span-3"
                           onChange={(e) => {
-                            // setnftData({ name: e.currentTarget.value });
+                            setNftValue({
+                              ...nftValue,
+                              name: e.currentTarget.value,
+                            });
+                          }}
+                        />
+                        <Label htmlFor="decsription" className="text-right">
+                          Descriotion:
+                        </Label>
+                        <Input
+                          id="desc"
+                          value={nftValue.desc}
+                          className="col-span-3"
+                          onChange={(e) => {
+                            setNftValue({
+                              ...nftValue,
+                              desc: e.currentTarget.value,
+                            });
                           }}
                         />
                       </div>
                       <DialogFooter>
-                        <Button>Cancel</Button>
-                        <Button onClick={mintNFTHandler}>Finsh</Button>
+                        <DialogClose asChild>
+                          <Button type="button" variant="secondary">
+                            Close
+                          </Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                          <Button onClick={mintNFTHandler}>Finish</Button>
+                        </DialogClose>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
