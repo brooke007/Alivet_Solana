@@ -1,15 +1,13 @@
 import axios from "axios";
 
-const url = `https://mainnet.helius-rpc.com/?api-key=ec7f74b2-9805-43b3-b33e-d51f0c2e06d6`;
+const url = `https://mainnet.helius-rpc.com/?api-key=f46e7c57-a4d4-43b0-b65b-1f287e2380cb`;
 
-interface NftDataProps {
-  name: string;
-  uri: string;
-  owner: string;
-  desc: string;
-}
-
-const mintCompressedNft = async (data: NftDataProps) => {
+const mintCompressedNft = async (
+  wallet: string,
+  name: string,
+  desc: string,
+  img: string
+) => {
   try {
     const response = await axios.post(
       url,
@@ -18,12 +16,13 @@ const mintCompressedNft = async (data: NftDataProps) => {
         id: "helius-test",
         method: "mintCompressedNft",
         params: {
-          name: data.name,
-          symbol: "ETFO",
-          owner: data.owner,
-          description: data.desc,
+          name: name,
+          symbol: "ALIVET",
+          owner: wallet,
+          description: desc,
           attributes: [],
-          imageUrl: data.uri,
+          imageUrl: img,
+          externalUrl: "",
           sellerFeeBasisPoints: 6900,
         },
       },
@@ -33,10 +32,10 @@ const mintCompressedNft = async (data: NftDataProps) => {
         },
       }
     );
-    return response.data.result;
+
+    console.log("Minted asset: ", response.data.result.assetId);
   } catch (error) {
-    console.error("Minting error", error);
-    throw error; // This allows the caller to handle the error as needed
+    console.error("Error minting asset:", error);
   }
 };
 

@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { IImgItem } from "@/shared/types/img";
 import clsx from "clsx";
 import MyButton from "@/components/ui/myButton";
-import { Check, Download, Eraser, Plus } from "lucide-react";
+import { Check, Download, Eraser, Play, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,12 +28,12 @@ import GIF from "gif.js";
 import Loading from "@/components/layout/loading";
 import { Button } from "@/components/ui/button";
 import mintCompressedNft from "@/lib/rpc/mint";
-import upload from "@/lib/rpc/upload";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useAlert } from "react-alert";
+import { upload, uploadMetadata } from "@/lib/rpc/upload";
 
-function getFileUriFromCid(cid: string) {
-  return `https://${cid}.ipfs.cf-ipfs.com/alivet.gif`;
+function getFileUriFromCid(cid: string, file: string) {
+  return `https://${cid}.ipfs.cf-ipfs.com/${file}`;
 }
 
 export default function Home() {
@@ -45,6 +45,7 @@ export default function Home() {
     name: "",
     desc: "",
   });
+  const frames = useRef([]);
   const [isloading, setIsloading] = useState(false);
   const [items, setItems] = useState([] as any);
   const { publicKey } = useWallet();
@@ -53,15 +54,6 @@ export default function Home() {
   const canvasObj = useRef<any>(null);
   const [frameCount, setFrameCount] = useState(0);
   const alert = useAlert();
-  const gif = useRef(
-    new GIF({
-      workers: 2,
-      quality: 5,
-      width: 1800,
-      height: 1600,
-      workerScript: "/src/lib/gif.worker.js",
-    })
-  );
 
   function addImg(uri: string) {
     setIsloading(true); // 开始加载时显示加载状态
@@ -100,9 +92,8 @@ export default function Home() {
 
     if (confirm("Do you want to use current paint as a frame?")) {
       const canvasElement = canvasObj.current.getElement();
-      gif.current.addFrame(canvasElement, { delay: 200, copy: true });
       setFrameCount((pre) => pre + 1);
-      setIsloading(false);
+      frames.current.push(canvasElement.toDataURL("image/png"));
       alert.success("Add frame success", {
         timeout: 1500,
       });
@@ -116,6 +107,8 @@ export default function Home() {
     }
     if (confirm("Do you want to clear current paint?")) {
       canvasObj.current.clear();
+      frames.current = [];
+      setFrameCount(0);
       alert.success("Add frame success", {
         timeout: 1500,
       });
@@ -128,10 +121,25 @@ export default function Home() {
       alert.error("Please add frame first");
       return;
     }
-    if (confirm("download GIF")) {
-      setIsloading(true);
 
-      gif.current.on("finished", function (blob: any) {
+    if (confirm("download GIF")) {
+      alert.info("generate GIF...", {
+        timeout: 2000,
+      });
+      const gif = new GIF({
+        workers: 2,
+        quality: 5,
+        width: 1000,
+        height: 1000,
+        workerScript: "/src/lib/gif.worker.js",
+      });
+      for (let i = 0; i < frames.current.length; i++) {
+        const img = new Image();
+        img.src = frames.current[i];
+        gif.addFrame(img, { delay: 200 }); // 假设每帧200ms
+      }
+
+      gif.on("finished", function (blob: any) {
         alert.show("download success", {
           type: "success",
         });
@@ -146,7 +154,9 @@ export default function Home() {
       });
 
       // 开始生成 GIF
-      gif.current.render();
+      setTimeout(() => {
+        gif.render();
+      }, 1000);
     }
   }
 
@@ -160,29 +170,66 @@ export default function Home() {
       return;
     } else {
       setIsloading(true);
-      (() => {
-        alert.info("generating GIF....");
-        gif.current.on("finished", async (blob: any) => {
-          alert.info("loading GIF....");
-          const cid = await upload(blob);
-          alert.info("MINT...It maybe take 1 min...", {
-            timeout: 30000,
-          });
-          await mintCompressedNft({
-            desc: nftValue.desc,
-            name: nftValue.name,
-            owner: wallet as string,
-            uri: getFileUriFromCid(cid),
-          }).finally(() => {
-            setIsloading(false);
-          });
-          alert.success("MINT Success", {
-            timeout: 5000,
-          });
+      alert.info("generating GIF....");
+      const gif = new GIF({
+        workers: 2,
+        quality: 5,
+        width: 1000,
+        height: 1000,
+        workerScript: "/src/lib/gif.worker.js",
+      });
+      for (let i = 0; i < frames.current.length; i++) {
+        const img = new Image();
+        img.src = frames.current[i];
+        gif.addFrame(img, { delay: 200 }); // 假设每帧200ms
+      }
+
+      gif.on("finished", async function (blob: any) {
+        alert.info("uploading metadata...");
+        const cid = await upload(blob);
+        alert.info("MINT...It maybe take 1 min...", {
+          timeout: 30000,
         });
-        gif.current.render();
-      })();
+        await mintCompressedNft(
+          wallet as string,
+          nftValue.name,
+          nftValue.desc,
+          getFileUriFromCid(cid, "alivet.gif")
+        ).finally(() => {
+          setIsloading(false);
+        });
+        alert.success("MINT Success", {
+          timeout: 5000,
+        });
+      });
+
+      // 开始生成 GIF
+      setTimeout(() => {
+        gif.render();
+      }, 1000);
     }
+  }
+
+  function playFramesOnCanvas() {
+    const canvas = canvasEl.current;
+    const ctx = canvas?.getContext("2d");
+    let frameIndex = 0;
+
+    function drawNextFrame() {
+      const frame = frames.current[frameIndex++];
+      const image = new Image();
+      image.onload = function () {
+        // 清除画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // 将当前帧绘制到画布上
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        // 设置下一帧
+        setTimeout(drawNextFrame, 200); // 假设每帧200毫秒
+      };
+      image.src = frame;
+    }
+
+    drawNextFrame();
   }
 
   const RenderImgs = useCallback(() => {
@@ -217,13 +264,13 @@ export default function Home() {
                     src={data.uri}
                   ></img>
                 </div>
-                <div className="w-[160px] my-2  text-[14px] from-neutral-300  text-[#E8E8E8]  text-start items-center truncate ">
+                <div className="w-[160px] my-2  text-[14px]  text-gray-700  text-start items-center truncate ">
                   {data.name}
                 </div>
               </div>
             ))
           : new Array(14).fill(
-              <Skeleton className="h-[150px] w-full rounded-xl" />
+              <Skeleton className="h-[150px] bg-gray-300 w-full rounded-xl" />
             )}
       </>
     );
@@ -247,7 +294,7 @@ export default function Home() {
     <>
       <ResizablePanelGroup direction="horizontal" className="w-screen">
         <ResizablePanel className="min-w-[200px]" defaultSize={15}>
-          <div className="flex flex-col h-full bg-[#252627] rounded-none">
+          <div className="flex flex-col h-full bg-[#F9F9F9] rounded-none">
             <div className="flex-1 flex flex-wrap  items-center justify-evenly gap-2 overflow-y-scroll p-5">
               <RenderImgs />
             </div>
@@ -255,11 +302,11 @@ export default function Home() {
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel className="min-w-[700px]" defaultSize={70}>
-          <div className="flex flex-col h-full py-3 overflow-hidden bg-gray-300">
+          <div className="flex flex-col h-full py-3 overflow-hidden bg-[#F9F9F9]">
             <div className="w-full h-full px-3 pb-">
               <div
                 className={clsx([
-                  "relative h-full w-full overfl5w-hidden  border-dashed rounded-md bg-white border-white border-2",
+                  "relative h-full w-full overfl5w-hidden  border-dashed rounded-md bg-white border-gray-200 border",
                 ])}
               >
                 <canvas height={1000} width={1000} ref={canvasEl} />
