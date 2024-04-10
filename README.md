@@ -6,7 +6,7 @@
 
 ## 1.Description
 
-In the realm of large-scale digital art creation and collaboration, current blockchain platforms often face challenges such as difficulties in organizing and focusing creativity. Many on-chain NFT platforms lack flexible creation tools and are unable to provide an in-depth collaborative and creative experience. Additionally, real-time collaboration and rapid iterative creation are also problematic in many on-chain environments due to transaction costs and speed limitations. `Alivet` addresses these issues by leveraging the advanced technology of Solana. Solana's high throughput and low transaction costs make large-scale collaboration and rapid NFT creation possible, while ensuring the security and efficiency of transactions. On the `Alivet` platform, artists and enthusiasts can not only collaborate to create NFTs but also manage and showcase their work in a structured way.
+In the realm of large-scale digital art creation and collaboration, current blockchain platforms often face challenges such as difficulties in organizing and focusing creativity. Many on-chain NFT platforms lack flexible creation tools and are unable to provide an in-depth collaborative and creative experience. Additionally, real-time collaboration and rapid iterative creation are also problematic in many on-chain environments due to transaction costs and speed limitations. `Alivet` addresses these issues by leveraging the advanced technology of Solana. Solana's high throughput and low transaction costs make large-scale collaboration and rapid NFT creation possible, while ensuring the security and efficiency of transactions. On the `Alivet` platform, artists and enthusiasts can not only collaborate to create NFTs with vivid animation but also manage and showcase their work in a structured way.
 
 ## 2.Alivet for Solana
 
@@ -108,9 +108,15 @@ This framework reinforces `Alivet’s` commitment to privacy while fostering a s
 
 ## 5.Contact us
 
-Telegram @Alivet
-Twitter @Alivet_solana
-Email 
+Twitter [@alivet_sol](https://twitter.com/alivet_sol)
+Email patrickmingx@gamil.com 
+
+@0sC12
+
+@cjellich
+
+@Vyas_Har
+
 
 
 
